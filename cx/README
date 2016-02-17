@@ -1,0 +1,36 @@
+******************
+Instructions for running CX Benchmark
+
+1. Copy the CX 1 TB dataset to your scratch directory:
+	 screen cp -r /project/projectdirs/paralleldb/spark/benchmarks/cx/data/cx $SCRATCH
+
+2. Submit CX spark job to the queue:
+	sbatch cx_sparkjob.sl
+
+Command Line Arguments to cx_sparkjob.sl
+
+	--rank <int>  (size of low rank approximation of A) (default: 16)
+	--exmem <int>  (executor memory. amount of memory to give executor process (a jvm) for each node) (default: 80 GB) (driver will get this same memory)
+
+	--cores <int> (total number of cores to use. if this is less than (num_nodes -1)*32 then spark will evenly distribute the total cores amongst all the nodes) (default: 960)
+
+	--collectl (if specified. collectl will run on every node and generate logs) (default: off)
+
+
+When your job is done copy your logs to a central location by running:
+
+	bin/copy-spark-logs.sh
+
+
+Note: to get off the queue faster try:
+	sbatch --qos=premium  cx_sparkjob.sl
+
+Note: to get more than 30 mim:
+	sbatch -p regular -t <number of min>  cx_sparkjob.sl
+
+Note: to use more than 31 nodes (1 for driver 30 for workers):
+	sbatch -N <number of nodes> cx_sparkjob.sl
+
+To check if your job started/finished/etc.:
+	squeue -u <your username>
+**************************
