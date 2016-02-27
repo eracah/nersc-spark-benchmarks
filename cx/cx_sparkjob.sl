@@ -35,9 +35,9 @@ done
 def_rank=16
 def_exmem=80
 def_total_cores=960
-exmem=${EXMEM:-def_exmem}
-rank=${RANK:-def_rank}
-total_cores=${CORES:-def_total_cores}
+exmem=${EXMEM:-$def_exmem}
+rank=${RANK:-$def_rank}
+total_cores=${CORES:-$def_total_cores}
 SCRIPT_DIR=/project/projectdirs/paralleldb/spark/benchmarks/cx
 
 module load spark
