@@ -1,0 +1,36 @@
+******************
+Instructions for running PCA Climate Benchmark
+
+1. Copy the Climate 2.2  TB dataset to your scratch directory:
+	 screen cp -r /global/cscratch1/sd/gittens/CFSROparquet  $SCRATCH
+
+2. Submit PCA spark job to the queue:
+	sbatch cori.submit.sl
+
+Command Line Arguments to cori.submit.sl
+
+	--rank <int>  (size of low rank approximation of A) (default: 16)
+	--exmem <int>  (executor memory. amount of memory to give executor process (a jvm) for each node) (default: 80 GB) (driver will get this same memory)
+
+	--cores <int> (total number of cores to use. if this is less than (num_nodes -1)*32 then spark will evenly distribute the total cores amongst all the nodes) (default: 960)
+
+	--collectl (if specified. collectl will run on every node and generate logs) (default: off)
+	--spark-version (which module version of spark to use) (default: cori default. you can look by doing "module show spark". should be 1.5.1)
+
+When your job is done copy your logs to a central location by running:
+
+	bin/copy-spark-logs.sh
+
+
+Note: to get off the queue faster try:
+	sbatch --qos=premium  cori.submit.sl
+
+Note: to get more than 30 mim:
+	sbatch -p regular -t <number of min>  cori.submit.sl
+
+Note: to use more than 31 nodes (1 for driver 30 for workers):
+	sbatch -N <number of nodes> cori.submit.sl
+
+To check if your job started/finished/etc.:
+	squeue -u <your username>
+**************************

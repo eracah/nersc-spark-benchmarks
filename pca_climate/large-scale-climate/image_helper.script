@@ -1,0 +1,45 @@
+#!/bin/bash
+
+def_rank=20
+def_exmem=80G
+def_total_cores=400
+def_partitions=30000
+def_version=1.5.1
+exmem=${EXMEM:-$def_exmem}
+rank=${RANK:-$def_rank}
+total_cores=${CORES:-$def_total_cores}
+nparts=${PARTS:-$def_partitions}
+version=${VERSION:-$def_version}
+echo "I was called with"  exmem $exmem rank $rank total_cores $total_cores npartitions $nparts version $version
+
+
+export SPARK_WORKER_DIR=$SCRATCH/spark/$SLURM_JOBID
+export SPARK_SLAVES=$SPARK_WORKER_DIR
+export SPARK_SLAVES=$SPARK_WORKER_DIR/slaves
+export SPARK_LOG_DIR=$SPARK_WORKER_DIR/sparklogs
+export SPARK_LOCAL_DIRS="/tmp,$SCRATCH"
+
+#export SPARK_LOCAL_DIRS="/tmp,/dev/shm"
+
+echo SPARK_LOCAL_DIRS is $SPARK_LOCAL_DIRS
+MASTER=$(/usr/local/bin/spark-1.5.1-bin-hadoop2.6/myfindmaster.sh)
+mkdir -p $SPARK_WORKER_DIR
+
+/usr/local/bin/spark-1.5.1-bin-hadoop2.6/myfindslaves.sh $MASTER $SPARK_WORKER_DIR/slaves
+export SPARKURL=spark://$MASTER:7077
+
+export PATH=$PATH:/usr/local/bin/spark-1.5.1-bin-hadoop2.6:/usr/local/bin/spark-1.5.1-bin-hadoop2.6/bin:/usr/local/bin/spark-1.5.1-bin-hadoop2.6/sbin:/usr/lib/jvm/java-7-openjdk-amd64/jre/bin/
+export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/
+
+echo starting
+
+start-all.sh
+INDIR=/global/project/projectdirs/paralleldb/spark/benchmarks/pca_climate/large-scale-climate
+
+cd $INDIR
+echo calling src/nersc.computeEOFs.sh $total_cores $nparts $exmem $rank $INDIR/target/scala-2.10/large-scale-climate-assembly-0.0.1.jar
+src/nersc.computeEOFs.sh $total_cores $nparts $exmem $rank $INDIR/target/scala-2.10/large-scale-climate-assembly-0.0.1.jar
+
+stop-all.sh
+
+
