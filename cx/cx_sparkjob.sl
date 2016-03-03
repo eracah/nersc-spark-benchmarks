@@ -3,8 +3,8 @@
 #SBATCH -N 31
 #SBATCH -t 30
 #SBATCH --ccm
-#SBATCH -o slurm_outputs/slurm_$SLURM_JOB_ID.out
-#SBATCH -e slurm_outputs/slurm_$SLURM_JOB_ID.out
+#SBATCH -o /project/projectdirs/paralleldb/spark/benchmarks/cx/slurm_outputs/slurm_%A.out
+#SBATCH -e /project/projectdirs/paralleldb/spark/benchmarks/cx/slurm_outputs/slurm_%A.out
 while [[ $# > 0 ]]
 do
 key=$1
@@ -24,6 +24,9 @@ case $key in
     ;;	
     --collectl)
     USE_COLLECTL=TRUE
+    ;;
+    -b|--breeze)
+    USE_BREEZE=TRUE
     ;;
     *)
             # unknown option
@@ -47,6 +50,11 @@ then
 	start-collectl.sh 
 	$SCRIPT_DIR/bin/runbig.sh $total_cores $rank 0 5 ""  $exmem $SCRIPT_DIR
 	stop-collectl.sh
+elif [ !  -z $USE_BREEZE ];
+then
+        module load breeze
+	trace-program.sh -f $SPARK_WORKER_DIR/breeze_trace_log \
+	$SCRIPT_DIR/bin/runbig.sh $total_cores $rank 0 5 ""  $exmem $SCRIPT_DIR
 else
 	$SCRIPT_DIR/bin/runbig.sh $total_cores $rank 0 5 ""  $exmem $SCRIPT_DIR
 fi

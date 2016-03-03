@@ -15,7 +15,7 @@ Command Line Arguments to cx_sparkjob.sl
 	--cores <int> (total number of cores to use. if this is less than (num_nodes -1)*32 then spark will evenly distribute the total cores amongst all the nodes) (default: 960)
 
 	--collectl (if specified. collectl will run on every node and generate logs) (default: off)
-
+	--breeze (will run breeze tracing on the job)
 
 When your job is done copy your logs to a central location by running:
 
